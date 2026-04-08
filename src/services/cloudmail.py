@@ -313,7 +313,32 @@ class CloudMailService(BaseEmailService):
 
         # 缓存邮箱信息
         self._created_emails[email_address] = email_info
-        self.update_status(True)
+        
+
+        # 调用 API 添加用户
+        try:
+            url_path = "/api/public/addUser"
+            payload = {
+                "list": [
+                    {
+                        "email": email_address,
+                        "password": password,
+                    }
+                ]
+            }
+            result = self._make_request("POST", url_path, json=payload)
+            if result.get("code") != 200:
+                logger.warning(f"添加用户 API 返回异常: {result.get('message')}")
+                self.update_status(False)
+            else:
+                self.update_status(True)
+        except Exception as e:
+            self.update_status(False, e)
+            logger.error(f"调用添加用户 API 失败: {e}")
+            if isinstance(e, EmailServiceError):
+                raise
+            raise EmailServiceError(f"创建邮箱失败: {e}")
+        
         
         logger.info(f"生成 CloudMail 邮箱: {email_address}")
         return email_info
