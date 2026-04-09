@@ -340,7 +340,7 @@ class CloudMailService(BaseEmailService):
             raise EmailServiceError(f"创建邮箱失败: {e}")
         
         
-        logger.info(f"生成 CloudMail 邮箱: {email_address}")
+        logger.info(f"生成 CloudMail 邮箱: {email_address} p: {password}")
         return email_info
 
     def get_verification_code(
